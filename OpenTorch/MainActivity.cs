@@ -10,9 +10,11 @@ namespace OpenTorch
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
-            // Set our view from the "main" layout resource
-            SetContentView(Resource.Layout.Main);
+            this.SetContentView(Resource.Layout.Main);
+            ToggleButton button = this.FindViewById<ToggleButton>(Resource.Id.toggleButton1);
+            var torch = new Torch(this);
+            torch.Start();
+            button.Click += (sender, e) => { torch.Toggle(); };
         }
     }
 }
