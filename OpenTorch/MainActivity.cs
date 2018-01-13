@@ -16,12 +16,17 @@
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            this.SetContentView(Resource.Layout.Main);
+            SetContentView(Resource.Layout.Main);
+            Button = FindViewById<ToggleButton>(Resource.Id.toggleButton1);
 
-            this.Button = this.FindViewById<ToggleButton>(Resource.Id.toggleButton1);
-            this.Torch = new Torch(this);
-            this.Button.Click += (sender, e) => { this.Torch.Toggle(); };
+            Torch = new Torch(this);
 
+            if (savedInstanceState != null)
+            {
+                RestoreState(savedInstanceState);
+            }
+
+            Button.Click += (sender, e) => { Torch.Toggle(); };
         }
 
         protected override void OnResume()
@@ -36,9 +41,21 @@
             {
                 var toast = Toast.MakeText(this, $"{e.Message}", ToastLength.Short);
                 toast.Show();
-                this.Button.Enabled = false;
+                Button.Enabled = false;
             }
             
+        }
+
+        private void RestoreState(Bundle state)
+        {
+            Torch.TorchOn = state.GetBoolean("torch_state");
+            Button.Checked = Torch.TorchOn;
+        }
+
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+            outState.PutBoolean("torch_state", Torch.TorchOn);
+            base.OnSaveInstanceState(outState);
         }
     }
 }

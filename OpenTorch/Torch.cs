@@ -7,23 +7,23 @@
 
     public class Torch
     {
-        private readonly Context context;
-        private readonly CameraManager cm;
-        private string[] cameras;
+        //private readonly Context _context;
+        private readonly CameraManager _cm;
+        private string[] _cameras;
 
         public Torch(Context context)
         {
-            this.context = context;
-            cm = (CameraManager)context.GetSystemService(Context.CameraService);
+            //_context = context;
+            _cm = (CameraManager)context.GetSystemService(Context.CameraService);
+            TorchOn = false;
         }
 
         private string RearFacingCamera { get; set; }
-
-        private bool TorchOn { get; set; }
+        public bool TorchOn { get; set; }
 
         public void Start()
         {
-            cameras = cm.GetCameraIdList();
+            _cameras = _cm.GetCameraIdList();
             var cam = GetRearFacingCamera();
             if (string.IsNullOrEmpty(cam))
             {
@@ -34,18 +34,14 @@
             {
                 throw new Exception("This device does not have a rear camera that supports flash.");
             }
-
             RearFacingCamera = cam;
-            TorchOn = false;
         }
 
         public void Toggle()
         {
-            if (!string.IsNullOrEmpty(RearFacingCamera))
-            {
-                this.TorchOn = !this.TorchOn;
-                cm.SetTorchMode(RearFacingCamera, TorchOn);
-            }
+            if (string.IsNullOrEmpty(RearFacingCamera)) return;
+            TorchOn = !TorchOn;
+            _cm.SetTorchMode(RearFacingCamera, TorchOn);
         }
 
         private bool CheckFlashSupported(string rearFacingCamera)
@@ -56,13 +52,13 @@
 
         private string GetRearFacingCamera()
         {
-            foreach (var cameraId in cameras)
+            foreach (var cameraId in _cameras)
             {
                 var chars = GetCharactaristics(cameraId);
 
                 var cameraFacing = (int)chars.Get(CameraCharacteristics.LensFacing);
-                const int RearFacingValue = (int)LensFacing.Back;
-                if (cameraFacing == RearFacingValue)
+                const int rearFacingValue = (int)LensFacing.Back;
+                if (cameraFacing == rearFacingValue)
                 {
                     return cameraId;
                 }
@@ -72,7 +68,7 @@
 
         private CameraCharacteristics GetCharactaristics(string cameraId)
         {
-            return this.cm.GetCameraCharacteristics(cameraId);
+            return _cm.GetCameraCharacteristics(cameraId);
         }
     }
 }
